@@ -1,4 +1,4 @@
-import AppStore from "../stores/AppStore";
+import RootStore from "../stores/RootStore";
 import IUser from "../types/User";
 import {computed, makeObservable} from "mobx";
 
@@ -8,7 +8,7 @@ export default class User implements IUser {
     email: string;
     password: string;
 
-    constructor(private store: AppStore, user: IUser) {
+    constructor(private store: RootStore, user: IUser) {
         this.id = user.id;
         this.username = user.username;
         this.email = user.email;

@@ -1,5 +1,5 @@
 import IReview from "../types/Review";
-import AppStore from "../stores/AppStore";
+import RootStore from "../stores/RootStore";
 import {computed, makeObservable} from "mobx";
 
 export default class Review implements IReview{
@@ -10,7 +10,7 @@ export default class Review implements IReview{
     content: string;
     grade: number;
 
-    constructor(private store: AppStore, review: IReview) {
+    constructor(private store: RootStore, review: IReview) {
         this.id = review.id;
         this.productId = review.productId;
         this.userId = review.userId;

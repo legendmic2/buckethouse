@@ -35,4 +35,16 @@ public class StoreContentDTO {
         this.description = entity.getDescription();
         this.stock = entity.getStock();
     }
+
+    public static ProductEntity toEntity(final StoreContentDTO dto) {
+        return ProductEntity.builder()
+                .id(dto.getId())
+                .vendorId(dto.getVendorId())
+                .title(dto.getTitle())
+                .price(dto.getPrice())
+                .deliveryFee(dto.getDeliveryFee())
+                .description(dto.getDescription())
+                .stock(dto.getStock())
+                .build();
+    }
 }
