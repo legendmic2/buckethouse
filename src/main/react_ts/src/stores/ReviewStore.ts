@@ -1,12 +1,12 @@
 import {action, computed, makeObservable, observable} from "mobx";
 import Review from "../models/Review";
-import AppStore from "./AppStore";
+import RootStore from "./RootStore";
 import IReview from "../types/Review";
 
 export default class ReviewStore {
     byId = observable.map<string, Review>();
 
-    constructor(private store: AppStore) {
+    constructor(private store: RootStore) {
         makeObservable(this);
     }
 

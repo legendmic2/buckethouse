@@ -1,12 +1,12 @@
 import {action, computed, makeObservable, observable} from "mobx";
 import User from "../models/User";
-import AppStore from "./AppStore";
+import RootStore from "./RootStore";
 import IUser from "../types/User";
 
 export default class UserStore {
     byId = observable.map<string, User>();
 
-    constructor(private store: AppStore) {
+    constructor(private store: RootStore) {
         makeObservable(this);
     }
 
