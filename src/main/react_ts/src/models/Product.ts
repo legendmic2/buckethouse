@@ -1,4 +1,4 @@
-import AppStore from "../stores/AppStore";
+import RootStore from "../stores/RootStore";
 import IProduct from "../types/Product";
 import {computed, makeObservable} from "mobx";
 
@@ -11,7 +11,7 @@ export default class Product implements IProduct{
     description: string;
     stock: number;
 
-    constructor(private store: AppStore, product: IProduct) {
+    constructor(private store: RootStore, product: IProduct) {
         this.id = product.id;
         this.vendorId = product.vendorId;
         this.title = product.title;
