@@ -12,8 +12,8 @@ export default class ProductStore {
         makeAutoObservable(this);
     }
 
-    @action load(storeContents: IProduct[]) {
-        storeContents.forEach((it) => this.byId.set(it.id, new Product(this.store, it)));
+    @action load(products: IProduct[]) {
+        products.forEach((it) => this.byId.set(it.id, new Product(this.store, it)));
     }
 
     @computed get all() {

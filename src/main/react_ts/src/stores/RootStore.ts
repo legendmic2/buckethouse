@@ -4,6 +4,6 @@ import ReviewStore from "./ReviewStore";
 
 export default class RootStore {
     user = new UserStore(this);
-    storeContent = new ProductStore(this);
+    product = new ProductStore(this);
     review = new ReviewStore(this);
 }

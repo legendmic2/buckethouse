@@ -18,7 +18,7 @@ export default class User implements IUser {
     }
 
     @computed get storeContents() {
-        return this.store.storeContent.all.filter((it) => it.vendorId === this.id);
+        return this.store.product.all.filter((it) => it.vendorId === this.id);
     }
 
     @computed get reviews() {

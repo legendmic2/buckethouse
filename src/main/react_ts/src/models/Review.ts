@@ -22,7 +22,7 @@ export default class Review implements IReview{
     }
 
     @computed get storeContent() {
-        return this.store.storeContent.all.find((it) => it.id === this.productId);
+        return this.store.product.all.find((it) => it.id === this.productId);
     }
 
     @computed get user() {
