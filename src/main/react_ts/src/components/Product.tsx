@@ -8,7 +8,18 @@ export interface Props {
 const Product = observer((props: Props) => {
     return (
         <div>
-            Hello, Product!
+            <div>
+                <strong>
+                    {props.product.title}
+                </strong>
+                <p>{props.product.description}</p>
+            </div>
+            <div>
+                {props.product.price}
+                {props.product.deliveryFee}
+                {props.product.vendorId}
+                {props.product.stock}
+            </div>
         </div>
     )
 });

@@ -6,7 +6,7 @@ export default class ProductApi {
     }
 
     async getAll() {
-        const res = await this.api.client.get(`/store`);
-        this.store.user.load(res.data);
+        const res = await this.api.client.get(`/store`); // todo: AxiosResponse 이용하여 AxiosUtil 생성
+        this.store.product.load(res.data.data);
     }
 }
