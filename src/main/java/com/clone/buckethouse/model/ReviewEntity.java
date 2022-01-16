@@ -18,10 +18,12 @@ public class ReviewEntity {
     @Id
     @GeneratedValue(generator="system-uuid")
     @GenericGenerator(name="system-uuid", strategy="uuid")
-    private String id;      //오브젝트의 id?
-    private String productId;   //product table의 id 참조
-    private String userId;      //user table의 id 참조
-    private String content;
-    private String title;
-    private int grade;
+    private String id;          //Review의 id
+
+
+    private String productId;   //product의 id product table의 id 참조     /   ** FK
+    private String userId;      //Reivew를 등록한 유저, user table의 id 참조 /   ** FK
+    private String content;     //Review 의 내용
+    private String title;       //Review의 제목
+    private int grade;          //리뷰의 점수
 }
