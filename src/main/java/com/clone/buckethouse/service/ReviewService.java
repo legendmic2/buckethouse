@@ -45,7 +45,7 @@ public class ReviewService {
         validate(entity);
         reviewRepository.save(entity);
 
-        log.info("entity id : {} is saved.", entity.getId());
+        log.info("review entity id : {} is saved.", entity.getId());
 
         return reviewRepository.findByProductId(entity.getProductId());
     }

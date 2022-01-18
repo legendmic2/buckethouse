@@ -4,6 +4,7 @@ import com.clone.buckethouse.dto.ResponseDTO;
 import com.clone.buckethouse.dto.StoreContentDTO;
 import com.clone.buckethouse.model.ProductEntity;
 import com.clone.buckethouse.service.StoreContentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Slf4j
 @RestController
 @RequestMapping("store")
 public class StoreController {
@@ -22,7 +23,9 @@ public class StoreController {
     @PostMapping
     public ResponseEntity<?> createStoreContent(@RequestBody StoreContentDTO dto) {
         try {
-            String temporaryUserId = "temporary-user"; // temporary user id.
+            //DB에 Vendor 테이블에 데이터를 수동으로 넣고, Vendor 테이블의 id와 동일한 id를 post로 요청해야 참조 무결성 위배 안됨
+            String vendorId=dto.getVendorId();
+            //String temporaryUserId = "qwe123"; // temporary user id.
 
             // (1) TodoEntity로 변환한다.
             ProductEntity entity = StoreContentDTO.toEntity(dto);
@@ -32,7 +35,7 @@ public class StoreController {
 
             // (3) 임시 사용자 아이디를 설정해준다. 이 부분은 4장 인증과 인가에서 수정할 예정이다.
             // 지금은 인증과 인가기능이 없으므로 한 사용자(temporary-user)만 로그인 없이 사용할 수 있는 애플리케이션인 셈이다.
-            entity.setVendorId(temporaryUserId);
+            entity.setVendorId(vendorId);
 
             // (4) 서비스를 이용해 Todo Entity를 생성한다.
             List<ProductEntity> entities = service.create(entity);

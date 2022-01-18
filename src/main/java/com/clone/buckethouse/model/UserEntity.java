@@ -19,7 +19,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="User")
 public class UserEntity {
-
+    //private String token;
     @Id
     @GeneratedValue(generator="system-uuid")
     @GenericGenerator(name="system-uuid", strategy="uuid")

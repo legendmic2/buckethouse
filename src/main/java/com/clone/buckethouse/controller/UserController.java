@@ -4,6 +4,7 @@ package com.clone.buckethouse.controller;
 import com.clone.buckethouse.dto.ResponseDTO;
 import com.clone.buckethouse.dto.UserDTO;
 import com.clone.buckethouse.model.UserEntity;
+import com.clone.buckethouse.security.TokenProvider;
 import com.clone.buckethouse.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 import static com.sun.org.apache.xalan.internal.xsltc.compiler.sym.error;
 
 @RestController
-@RequestMapping("auth")
+@RequestMapping("/auth")
 public class UserController {
 
     @Autowired
     private UserService service;
+
+    @Autowired
+    private TokenProvider tokenProvider;
 
 
     @PostMapping("/signup")
@@ -61,10 +65,15 @@ public class UserController {
         UserEntity user = service.getByCredentials(userDTO.getEmail(),userDTO.getPassword());
 
         if(user != null){
-            //해당 User info가 있다는 것.
+
+           //토큰 생성
+           final String token = tokenProvider.create(user);
+
+           //해당 User info가 있다는 것.
            final UserDTO responseUserDTO = UserDTO.builder()
-                        .username(user.getUsername())
+                        .id(user.getId())
                         .email(user.getEmail())
+                        .token(token)
                         .build();
 
             return ResponseEntity.ok().body(responseUserDTO);
