@@ -23,4 +23,10 @@ public class UserDTO {
     public static UserEntity toEntity(final UserDTO dto){
         return UserEntity.builder().id(dto.getId()).username(dto.getUsername()).email(dto.getEmail()).build();
     }
+
+    public void update(final UserDTO dto){
+        if(dto.getPassword()!=null){
+            this.password = dto.getPassword();
+        }
+    }
 }

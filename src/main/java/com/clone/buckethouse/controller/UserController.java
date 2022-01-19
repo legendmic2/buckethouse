@@ -6,15 +6,17 @@ import com.clone.buckethouse.dto.UserDTO;
 import com.clone.buckethouse.model.UserEntity;
 import com.clone.buckethouse.security.TokenProvider;
 import com.clone.buckethouse.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 import static com.sun.org.apache.xalan.internal.xsltc.compiler.sym.error;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 public class UserController {
@@ -24,6 +26,8 @@ public class UserController {
 
     @Autowired
     private TokenProvider tokenProvider;
+
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 
     @PostMapping("/signup")
@@ -36,7 +40,7 @@ public class UserController {
                     .id(userDTO.getId())
                     .username(userDTO.getUsername())
                     .email(userDTO.getEmail())
-                    .password(userDTO.getPassword())
+                    .password(passwordEncoder.encode(userDTO.getPassword()))
                     .build();
 
             //변환된 Entity를 Service 이용하여 repository로 전달
@@ -62,7 +66,7 @@ public class UserController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticate(@RequestBody UserDTO userDTO){
 
-        UserEntity user = service.getByCredentials(userDTO.getEmail(),userDTO.getPassword());
+        UserEntity user = service.getByCredentials(userDTO.getEmail(),userDTO.getPassword(),passwordEncoder);
 
         if(user != null){
 
@@ -86,4 +90,49 @@ public class UserController {
         }
 
     }
+    /*
+    @PutMapping
+    public ResponseEntity<?> edit(@RequestBody String updatePassword,@AuthenticationPrincipal String userId,UserDTO userDTO){
+        UserEntity entity = service.getByCredentials(userDTO.getEmail(),userDTO.getPassword());
+        log.info(entity.getEmail());
+        log.info(entity.getPassword());
+
+        UserEntity user = UserEntity.builder()
+                .id(userId)
+                .username(userDTO.getUsername())
+                .email(userDTO.getEmail())
+                .password(userDTO.getPassword())
+                .build();
+
+
+        UserEntity user = UserEntity.builder()
+                .id(userId)
+                .email(entity.getEmail())
+                .password(updatePassword)
+                .build();
+
+        UserEntity updateUser = service.update(user);
+
+
+        if(updateUser != null){
+
+            final UserDTO responseUserDTO = UserDTO.builder()
+                    .id(updateUser.getId())
+                    .email(updateUser.getEmail())
+                    .password(updateUser.getPassword())
+                    .build();
+
+            return ResponseEntity.ok().body(responseUserDTO);
+
+        }else{
+            ResponseDTO response = ResponseDTO.builder().error("update failed").build();
+            return ResponseEntity.badRequest().body(response);
+        }
+    }*/
+
+/*
+    @DeleteMapping
+    public ResponseEntity<?> delete(@RequestBody UserDTO userDTO) {
+        //UserEntity user = service
+    }*/
 }
