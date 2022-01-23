@@ -83,9 +83,8 @@ public class ReviewController {
 
     }
 
-    @GetMapping
-    public ResponseEntity<?> retrieveReviewList(@AuthenticationPrincipal String userId){
-        //String temp = "smapleID";           //create시 id로 했는데  리스트 찾을 땐 productId로 함..
+    @GetMapping("/userid")
+    public ResponseEntity<?> retrieveReviewList_user(@AuthenticationPrincipal String userId){
 
         //1. 서비스의 메서드의 retrieve()를 사용해 ReviewList를 가져온다
         List<ReviewEntity> entities = reviewService.retrieve(userId);
@@ -100,6 +99,33 @@ public class ReviewController {
         return ResponseEntity.ok().body(response);
     }
 
+    @GetMapping("/productid")
+    public ResponseEntity<?> retrieveReviewList_product(){
+        //List<ProductEntity> productEntities = service.retrieve("qwe12345");
+
+
+        List<ReviewEntity> entities = reviewService.retrieve_product("qwe12345");
+
+
+        //자바 스트림을 이용해 리턴된 엔티티 리스트를 Revier DTO로 변환환
+        List<ReviewDTO> dtos = entities.stream().map(ReviewDTO::new).collect(Collectors.toList());
+
+        ResponseDTO<ReviewDTO> response = ResponseDTO.<ReviewDTO>builder().data(dtos).build();
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> retrieveReviewList_all(){
+        List<ReviewEntity> entities = reviewService.retrieve_all();
+
+        List<ReviewDTO> dtos = entities.stream().map(ReviewDTO::new).collect(Collectors.toList());
+
+        ResponseDTO<ReviewDTO> response = ResponseDTO.<ReviewDTO>builder().data(dtos).build();
+
+        return ResponseEntity.ok().body(response);
+    }
+
     @PutMapping
     public ResponseEntity<?> updateReview(@RequestBody ReviewDTO dto, @AuthenticationPrincipal String userId){
         //String temp = "2c9e818c7e3eed68017e3eee8ae50000";
@@ -108,7 +134,10 @@ public class ReviewController {
         ReviewEntity entity = ReviewDTO.toReviewEntity(dto);
 
         //2. id를 userId로 초기화한다.
-        entity.setId(userId);
+        entity.setUserId(userId);
+
+        entity.setId("2c9e818c7e868a13017e868bdc160001");
+
 
         //3. 서비스를 이용해 entity를 업데이트한다.
         List<ReviewEntity> entities=reviewService.update(entity);

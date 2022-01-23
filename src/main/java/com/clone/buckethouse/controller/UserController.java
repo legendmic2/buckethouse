@@ -90,49 +90,5 @@ public class UserController {
         }
 
     }
-    /*
-    @PutMapping
-    public ResponseEntity<?> edit(@RequestBody String updatePassword,@AuthenticationPrincipal String userId,UserDTO userDTO){
-        UserEntity entity = service.getByCredentials(userDTO.getEmail(),userDTO.getPassword());
-        log.info(entity.getEmail());
-        log.info(entity.getPassword());
 
-        UserEntity user = UserEntity.builder()
-                .id(userId)
-                .username(userDTO.getUsername())
-                .email(userDTO.getEmail())
-                .password(userDTO.getPassword())
-                .build();
-
-
-        UserEntity user = UserEntity.builder()
-                .id(userId)
-                .email(entity.getEmail())
-                .password(updatePassword)
-                .build();
-
-        UserEntity updateUser = service.update(user);
-
-
-        if(updateUser != null){
-
-            final UserDTO responseUserDTO = UserDTO.builder()
-                    .id(updateUser.getId())
-                    .email(updateUser.getEmail())
-                    .password(updateUser.getPassword())
-                    .build();
-
-            return ResponseEntity.ok().body(responseUserDTO);
-
-        }else{
-            ResponseDTO response = ResponseDTO.builder().error("update failed").build();
-            return ResponseEntity.badRequest().body(response);
-        }
-    }*/
-
-/*
-    @DeleteMapping
-    public ResponseEntity<?> delete(@RequestBody UserDTO userDTO) {
-        //UserEntity user = service
-    }*/
 }

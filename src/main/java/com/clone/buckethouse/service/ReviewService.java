@@ -51,11 +51,20 @@ public class ReviewService {
     }
 
     //retrieve 메소드
-    public List<ReviewEntity> retrieve(final String productId){
+    public List<ReviewEntity> retrieve(final String param){
+        return reviewRepository.findByUserId(param);
+    }
+    //retrieve_product 메소드
+    public List<ReviewEntity> retrieve_product(final String productId){
         return reviewRepository.findByProductId(productId);
     }
+    //retrieve_all 메소드
+    public List<ReviewEntity> retrieve_all(){
+        return reviewRepository.findAllBy();
+    }
 
-    //update 메소드
+
+    //update 메소드  특정 User가 Signin 하고 특정 ProductId를가진 리스트를 리턴.
     public List<ReviewEntity> update(final ReviewEntity entity){
         //1. 저장할 데이터가 유효한지 확인한다.
         validate(entity);
@@ -72,9 +81,10 @@ public class ReviewService {
             review.setGrade(entity.getGrade());
 
             reviewRepository.save(review);
+            log.info("service->update->save success");
         });
 
-        return retrieve(entity.getProductId());
+        return retrieve_product(entity.getProductId());
     }
 
     public List<ReviewEntity> delete(final ReviewEntity entity){
