@@ -7,6 +7,7 @@ import com.clone.buckethouse.dto.StoreContentDTO;
 import com.clone.buckethouse.model.ProductEntity;
 import com.clone.buckethouse.model.ReviewEntity;
 import com.clone.buckethouse.persistence.ProductRepository;
+import com.clone.buckethouse.persistence.UserRepository;
 import com.clone.buckethouse.service.ReviewService;
 import com.clone.buckethouse.service.StoreContentService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +28,15 @@ public class ReviewController {
     private ReviewService reviewService;
 
     @Autowired
-    private ProductRepository repository;
+    private ProductRepository productRepository;
 
     @Autowired
-    private StoreContentService service;
+    private UserRepository userRepository;
+
+    @Autowired
+    private StoreContentService storeContentService;
+
+
 
     @GetMapping("/create")
     public ResponseEntity<?> createReview_prac(){
@@ -84,7 +90,7 @@ public class ReviewController {
     }
 
     @GetMapping("/userid")
-    public ResponseEntity<?> retrieveReviewList_user(@AuthenticationPrincipal String userId){
+    public ResponseEntity<?> retrieveReviewListByUser(@AuthenticationPrincipal String userId){
 
         //1. 서비스의 메서드의 retrieve()를 사용해 ReviewList를 가져온다
         List<ReviewEntity> entities = reviewService.retrieve(userId);
@@ -100,9 +106,8 @@ public class ReviewController {
     }
 
     @GetMapping("/productid")
-    public ResponseEntity<?> retrieveReviewList_product(){
+    public ResponseEntity<?> retrieveReviewListByProduct(){
         //List<ProductEntity> productEntities = service.retrieve("qwe12345");
-
 
         List<ReviewEntity> entities = reviewService.retrieve_product("qwe12345");
 
@@ -116,7 +121,7 @@ public class ReviewController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<?> retrieveReviewList_all(){
+    public ResponseEntity<?> retrieveReviewListByAll(){
         List<ReviewEntity> entities = reviewService.retrieve_all();
 
         List<ReviewDTO> dtos = entities.stream().map(ReviewDTO::new).collect(Collectors.toList());
@@ -155,7 +160,7 @@ public class ReviewController {
     @DeleteMapping
     public ResponseEntity<?> deleteReview(@RequestBody ReviewDTO dto, @AuthenticationPrincipal String userId){
         try {
-            //String temp = "2c9e818c7e3f7e33017e3f7e4e8a0000";
+
 
             //1. ReviewEntity로 변환한다.
             ReviewEntity entity = ReviewDTO.toReviewEntity(dto);
