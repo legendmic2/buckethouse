@@ -7,6 +7,7 @@ import com.clone.buckethouse.dto.StoreContentDTO;
 import com.clone.buckethouse.model.ProductEntity;
 import com.clone.buckethouse.model.ReviewEntity;
 import com.clone.buckethouse.persistence.ProductRepository;
+import com.clone.buckethouse.persistence.ReviewRepository;
 import com.clone.buckethouse.persistence.UserRepository;
 import com.clone.buckethouse.service.ReviewService;
 import com.clone.buckethouse.service.StoreContentService;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -26,6 +28,9 @@ import java.util.stream.Collectors;
 public class ReviewController {
     @Autowired
     private ReviewService reviewService;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     @Autowired
     private ProductRepository productRepository;
@@ -112,7 +117,7 @@ public class ReviewController {
         List<ReviewEntity> entities = reviewService.retrieve_product("qwe12345");
 
 
-        //자바 스트림을 이용해 리턴된 엔티티 리스트를 Revier DTO로 변환환
+        //자바 스트림을 이용해 리턴된 엔티티 리스트를 Revier DTO로 변환함.
         List<ReviewDTO> dtos = entities.stream().map(ReviewDTO::new).collect(Collectors.toList());
 
         ResponseDTO<ReviewDTO> response = ResponseDTO.<ReviewDTO>builder().data(dtos).build();
@@ -138,11 +143,16 @@ public class ReviewController {
         //1. dto를 entity로 변환한다.
         ReviewEntity entity = ReviewDTO.toReviewEntity(dto);
 
-        //2. id를 userId로 초기화한다.
-        entity.setUserId(userId);
+        Optional<ReviewEntity> optional = reviewRepository.findById(dto.getId());
+        System.out.println(optional.get());
 
-        entity.setId("2c9e818c7e868a13017e868bdc160001");
+        if(optional.isPresent()) {
+            String id = optional.get().getId();
+            //2. id를 userId로 초기화한다.
+            entity.setUserId(userId);
 
+            entity.setId(id);
+        }
 
         //3. 서비스를 이용해 entity를 업데이트한다.
         List<ReviewEntity> entities=reviewService.update(entity);
