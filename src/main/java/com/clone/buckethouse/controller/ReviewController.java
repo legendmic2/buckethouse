@@ -7,16 +7,22 @@ import com.clone.buckethouse.dto.StoreContentDTO;
 import com.clone.buckethouse.model.ProductEntity;
 import com.clone.buckethouse.model.ReviewEntity;
 import com.clone.buckethouse.persistence.ProductRepository;
+import com.clone.buckethouse.persistence.ReviewRepository;
+import com.clone.buckethouse.persistence.UserRepository;
 import com.clone.buckethouse.service.ReviewService;
 import com.clone.buckethouse.service.StoreContentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -27,10 +33,18 @@ public class ReviewController {
     private ReviewService reviewService;
 
     @Autowired
-    private ProductRepository repository;
+    private ReviewRepository reviewRepository;
 
     @Autowired
-    private StoreContentService service;
+    private ProductRepository productRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private StoreContentService storeContentService;
+
+
 
     @GetMapping("/create")
     public ResponseEntity<?> createReview_prac(){
@@ -46,21 +60,14 @@ public class ReviewController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createReview(@RequestBody ReviewDTO dto, @AuthenticationPrincipal String userId){
+    public ResponseEntity<?> createReview(@RequestBody ReviewDTO dto,@AuthenticationPrincipal String userId){
         try{
-            //ReviewEntity entity = ReviewDTO.toReviewEntity(dto);
-            log.info(userId);
-            //List<ProductEntity> list = service.retrieve("qwe123");
-            //List<StoreContentDTO> dtos = list.stream().map(StoreContentDTO::new).collect(Collectors.toList());
-            log.info(dto.getProductId());
-
+            //log.info(userId);
+            log.info(dto.getProductId());   log.info(dto.getId());
             // 1. toReviewEntity 로 변환
             ReviewEntity entity = ReviewDTO.toReviewEntity(dto);
-
-            // 2. Review id를 null로 초기화
-            entity.setId(userId);
-            entity.setProductId(dto.getProductId());
-            // 3. 임시 Review id 설정
+            entity.setId(null);
+            // 3. Review userId 설정
             entity.setUserId(userId);
 
             // 4. 서비스를 이용하여 Review 엔티티를 생성한다.
@@ -84,31 +91,55 @@ public class ReviewController {
     }
 
     @GetMapping
-    public ResponseEntity<?> retrieveReviewList(@AuthenticationPrincipal String userId){
-        //String temp = "smapleID";           //create시 id로 했는데  리스트 찾을 땐 productId로 함..
+    public ResponseEntity<?> retrieveReviewWithAuth(@RequestParam(value = "ProductId", required = false) String ProductId,@AuthenticationPrincipal String userId){
+        ResponseDTO<ReviewDTO> response = new ResponseDTO<>();
 
-        //1. 서비스의 메서드의 retrieve()를 사용해 ReviewList를 가져온다
-        List<ReviewEntity> entities = reviewService.retrieve(userId);
+        //userId 기준 review 조회할 경우
+        if(ProductId==null) {
 
-        //2. 자바 스트림을 이용해 리턴된 엔티티 리스트를 ReviewDTO리스트로 변환한다.
-        List<ReviewDTO> dtos = entities.stream().map(ReviewDTO::new).collect(Collectors.toList());
+            System.out.println("해당 유저로 조회");
+            List<ReviewEntity> entities = reviewService.retrieve(userId);
 
-        //3. 변환된 ReviewDTO리스트를 이용해 ResponseDTO를 초기화한다.
-        ResponseDTO<ReviewDTO> response = ResponseDTO.<ReviewDTO>builder().data(dtos).build();
+            //2. 자바 스트림을 이용해 리턴된 엔티티 리스트를 ReviewDTO리스트로 변환한다.
+            List<ReviewDTO> dtos = entities.stream().map(ReviewDTO::new).collect(Collectors.toList());
 
-        //4.리턴한다.
+            //3. 변환된 ReviewDTO리스트를 이용해 ResponseDTO를 초기화한다.
+            response = ResponseDTO.<ReviewDTO>builder().data(dtos).build();
+        }
+
+        //ProductId 로 조회할 경우
+        if(ProductId!=null) {
+            System.out.println("해당 product Id로 조회");
+            String product_id = ProductId;
+            //Product Id 기준 조회
+            List<ReviewEntity> entities = reviewService.retrieveByProductId(product_id);
+
+            //자바 스트림을 이용해 리턴된 엔티티 리스트를 Revier DTO로 변환함.
+            List<ReviewDTO> dtos = entities.stream().map(ReviewDTO::new).collect(Collectors.toList());
+
+            response = ResponseDTO.<ReviewDTO>builder().data(dtos).build();
+        }
+
         return ResponseEntity.ok().body(response);
     }
 
+
     @PutMapping
     public ResponseEntity<?> updateReview(@RequestBody ReviewDTO dto, @AuthenticationPrincipal String userId){
-        //String temp = "2c9e818c7e3eed68017e3eee8ae50000";
 
         //1. dto를 entity로 변환한다.
         ReviewEntity entity = ReviewDTO.toReviewEntity(dto);
 
-        //2. id를 userId로 초기화한다.
-        entity.setId(userId);
+        Optional<ReviewEntity> optional = reviewRepository.findById(dto.getId());
+        System.out.println(optional.get());
+
+        if(optional.isPresent()) {
+            String id = optional.get().getId();
+            //2. id를 userId로 초기화한다.
+            entity.setUserId(userId);
+
+            entity.setId(id);
+        }
 
         //3. 서비스를 이용해 entity를 업데이트한다.
         List<ReviewEntity> entities=reviewService.update(entity);
@@ -123,16 +154,15 @@ public class ReviewController {
 
     }
 
+
     @DeleteMapping
     public ResponseEntity<?> deleteReview(@RequestBody ReviewDTO dto, @AuthenticationPrincipal String userId){
         try {
-            //String temp = "2c9e818c7e3f7e33017e3f7e4e8a0000";
 
             //1. ReviewEntity로 변환한다.
             ReviewEntity entity = ReviewDTO.toReviewEntity(dto);
 
-            entity.setId(userId);
-
+            entity.setUserId(userId);
             //2. 서비스를 이용해 entity를 삭제한다.
             List<ReviewEntity> entities = reviewService.delete(entity);
 

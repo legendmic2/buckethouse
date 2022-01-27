@@ -60,20 +60,6 @@ public class UserService {
         return repository.save(entity);
     }
 
-
-    /*
-    public UserEntity delete(final UserEntity userEntity){
-        final String email = userEntity.getEmail();
-        log.info("delete email : {}",email);
-
-        if(!repository.existsByEmail(email)){
-            log.warn("Email already deleted.. {}",email);
-            throw new RuntimeException("Email already deleted");
-        }
-
-        return repository.delete(userEntity);
-    }*/
-
     //email과 password 를 입력시 해당 데이터를 찾는 메서드
     public UserEntity getByCredentials(final String email, final String password,final PasswordEncoder encoder){
         final UserEntity originalUser = repository.findByEmail(email);
