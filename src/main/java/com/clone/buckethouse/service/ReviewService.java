@@ -51,18 +51,13 @@ public class ReviewService {
     }
 
     //retrieve 메소드
-    public List<ReviewEntity> retrieve(final String param){
-        return reviewRepository.findByUserId(param);
+    public List<ReviewEntity> retrieve(final String userId){
+        return reviewRepository.findByUserId(userId);
     }
     //retrieve_product 메소드
-    public List<ReviewEntity> retrieve_product(final String productId){
+    public List<ReviewEntity> retrieveByProductId(final String productId){
         return reviewRepository.findByProductId(productId);
     }
-    //retrieve_all 메소드
-    public List<ReviewEntity> retrieve_all(){
-        return reviewRepository.findAllBy();
-    }
-
 
     //update 메소드  특정 User가 Signin 하고 특정 ProductId를가진 리스트를 리턴.
     public List<ReviewEntity> update(final ReviewEntity entity){
@@ -84,7 +79,7 @@ public class ReviewService {
             log.info("service->update->save success");
         });
 
-        return retrieve_product(entity.getProductId());
+        return retrieveByProductId(entity.getProductId());
     }
 
     public List<ReviewEntity> delete(final ReviewEntity entity){
@@ -113,7 +108,7 @@ public class ReviewService {
             log.warn("ReviewEntity cannot be null");
             throw new RuntimeException("ReivewEntity cannot be null");
         }
-        if(entity.getId()==null){
+        if(entity.getProductId()==null){
             log.warn("Unknown Reivew");
             throw new RuntimeException("Unknown Review");
         }

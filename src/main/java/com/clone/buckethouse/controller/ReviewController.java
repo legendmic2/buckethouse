@@ -60,21 +60,14 @@ public class ReviewController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createReview(@RequestBody ReviewDTO dto, @AuthenticationPrincipal String userId){
+    public ResponseEntity<?> createReview(@RequestBody ReviewDTO dto,@AuthenticationPrincipal String userId){
         try{
-            //ReviewEntity entity = ReviewDTO.toReviewEntity(dto);
-            log.info(userId);
-            //List<ProductEntity> list = service.retrieve("qwe123");
-            //List<StoreContentDTO> dtos = list.stream().map(StoreContentDTO::new).collect(Collectors.toList());
-            log.info(dto.getProductId());
-
+            //log.info(userId);
+            log.info(dto.getProductId());   log.info(dto.getId());
             // 1. toReviewEntity 로 변환
             ReviewEntity entity = ReviewDTO.toReviewEntity(dto);
-
-
-            entity.setId(userId);
-            entity.setProductId(dto.getProductId());
-            // 3. 임시 Review id 설정
+            entity.setId(null);
+            // 3. Review userId 설정
             entity.setUserId(userId);
 
             // 4. 서비스를 이용하여 Review 엔티티를 생성한다.
@@ -96,54 +89,40 @@ public class ReviewController {
         }
 
     }
-    @GetMapping("/list")
-    public ResponseEntity<?> retrieveReviewAll(@RequestParam(value = "ProductId", required = false) String ProductId) {
-        //로그인을 안했을 경우도 리뷰 리스트들은 볼 수 있어야함.
-        ResponseDTO<ReviewDTO> response= new ResponseDTO<>();
+
+    @GetMapping
+    public ResponseEntity<?> retrieveReviewWithAuth(@RequestParam(value = "ProductId", required = false) String ProductId,@AuthenticationPrincipal String userId){
+        ResponseDTO<ReviewDTO> response = new ResponseDTO<>();
+
+        //userId 기준 review 조회할 경우
         if(ProductId==null) {
-            System.out.println("전부다 조회");
 
-            List<ReviewEntity> entities = reviewService.retrieve_all();
+            System.out.println("해당 유저로 조회");
+            List<ReviewEntity> entities = reviewService.retrieve(userId);
 
+            //2. 자바 스트림을 이용해 리턴된 엔티티 리스트를 ReviewDTO리스트로 변환한다.
             List<ReviewDTO> dtos = entities.stream().map(ReviewDTO::new).collect(Collectors.toList());
 
+            //3. 변환된 ReviewDTO리스트를 이용해 ResponseDTO를 초기화한다.
             response = ResponseDTO.<ReviewDTO>builder().data(dtos).build();
+        }
 
-
-        }else if(ProductId!=null) {
+        //ProductId 로 조회할 경우
+        if(ProductId!=null) {
             System.out.println("해당 product Id로 조회");
             String product_id = ProductId;
             //Product Id 기준 조회
-            List<ReviewEntity> entities = reviewService.retrieve_product(product_id);
-
+            List<ReviewEntity> entities = reviewService.retrieveByProductId(product_id);
 
             //자바 스트림을 이용해 리턴된 엔티티 리스트를 Revier DTO로 변환함.
             List<ReviewDTO> dtos = entities.stream().map(ReviewDTO::new).collect(Collectors.toList());
 
             response = ResponseDTO.<ReviewDTO>builder().data(dtos).build();
-
-
         }
-        return ResponseEntity.ok().body(response);
-
-    }
-    @GetMapping
-    public ResponseEntity<?> retrieveReviewWithAuth(@AuthenticationPrincipal String userId){
-
-        //userId 기준 review 조회
-        System.out.println("해당 유저로 조회");
-        List<ReviewEntity> entities = reviewService.retrieve(userId);
-
-        //2. 자바 스트림을 이용해 리턴된 엔티티 리스트를 ReviewDTO리스트로 변환한다.
-        List<ReviewDTO> dtos = entities.stream().map(ReviewDTO::new).collect(Collectors.toList());
-
-        //3. 변환된 ReviewDTO리스트를 이용해 ResponseDTO를 초기화한다.
-        ResponseDTO<ReviewDTO> response = ResponseDTO.<ReviewDTO>builder().data(dtos).build();
-
-        //return ResponseEntity.ok().body(response);
 
         return ResponseEntity.ok().body(response);
     }
+
 
     @PutMapping
     public ResponseEntity<?> updateReview(@RequestBody ReviewDTO dto, @AuthenticationPrincipal String userId){
@@ -175,16 +154,15 @@ public class ReviewController {
 
     }
 
+
     @DeleteMapping
     public ResponseEntity<?> deleteReview(@RequestBody ReviewDTO dto, @AuthenticationPrincipal String userId){
         try {
 
-
             //1. ReviewEntity로 변환한다.
             ReviewEntity entity = ReviewDTO.toReviewEntity(dto);
 
-            entity.setId(userId);
-
+            entity.setUserId(userId);
             //2. 서비스를 이용해 entity를 삭제한다.
             List<ReviewEntity> entities = reviewService.delete(entity);
 
