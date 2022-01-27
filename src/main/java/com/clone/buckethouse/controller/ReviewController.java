@@ -14,7 +14,10 @@ import com.clone.buckethouse.service.StoreContentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -68,7 +71,7 @@ public class ReviewController {
             // 1. toReviewEntity 로 변환
             ReviewEntity entity = ReviewDTO.toReviewEntity(dto);
 
-            // 2. Review id를 null로 초기화
+
             entity.setId(userId);
             entity.setProductId(dto.getProductId());
             // 3. 임시 Review id 설정
@@ -93,11 +96,42 @@ public class ReviewController {
         }
 
     }
+    @GetMapping("/list")
+    public ResponseEntity<?> retrieveReviewAll(@RequestParam(value = "ProductId", required = false) String ProductId) {
+        //로그인을 안했을 경우도 리뷰 리스트들은 볼 수 있어야함.
+        ResponseDTO<ReviewDTO> response= new ResponseDTO<>();
+        if(ProductId==null) {
+            System.out.println("전부다 조회");
 
-    @GetMapping("/userid")
-    public ResponseEntity<?> retrieveReviewListByUser(@AuthenticationPrincipal String userId){
+            List<ReviewEntity> entities = reviewService.retrieve_all();
 
-        //1. 서비스의 메서드의 retrieve()를 사용해 ReviewList를 가져온다
+            List<ReviewDTO> dtos = entities.stream().map(ReviewDTO::new).collect(Collectors.toList());
+
+            response = ResponseDTO.<ReviewDTO>builder().data(dtos).build();
+
+
+        }else if(ProductId!=null) {
+            System.out.println("해당 product Id로 조회");
+            String product_id = ProductId;
+            //Product Id 기준 조회
+            List<ReviewEntity> entities = reviewService.retrieve_product(product_id);
+
+
+            //자바 스트림을 이용해 리턴된 엔티티 리스트를 Revier DTO로 변환함.
+            List<ReviewDTO> dtos = entities.stream().map(ReviewDTO::new).collect(Collectors.toList());
+
+            response = ResponseDTO.<ReviewDTO>builder().data(dtos).build();
+
+
+        }
+        return ResponseEntity.ok().body(response);
+
+    }
+    @GetMapping
+    public ResponseEntity<?> retrieveReviewWithAuth(@AuthenticationPrincipal String userId){
+
+        //userId 기준 review 조회
+        System.out.println("해당 유저로 조회");
         List<ReviewEntity> entities = reviewService.retrieve(userId);
 
         //2. 자바 스트림을 이용해 리턴된 엔티티 리스트를 ReviewDTO리스트로 변환한다.
@@ -106,39 +140,13 @@ public class ReviewController {
         //3. 변환된 ReviewDTO리스트를 이용해 ResponseDTO를 초기화한다.
         ResponseDTO<ReviewDTO> response = ResponseDTO.<ReviewDTO>builder().data(dtos).build();
 
-        //4.리턴한다.
-        return ResponseEntity.ok().body(response);
-    }
-
-    @GetMapping("/productid")
-    public ResponseEntity<?> retrieveReviewListByProduct(){
-        //List<ProductEntity> productEntities = service.retrieve("qwe12345");
-
-        List<ReviewEntity> entities = reviewService.retrieve_product("qwe12345");
-
-
-        //자바 스트림을 이용해 리턴된 엔티티 리스트를 Revier DTO로 변환함.
-        List<ReviewDTO> dtos = entities.stream().map(ReviewDTO::new).collect(Collectors.toList());
-
-        ResponseDTO<ReviewDTO> response = ResponseDTO.<ReviewDTO>builder().data(dtos).build();
-
-        return ResponseEntity.ok().body(response);
-    }
-
-    @GetMapping("/all")
-    public ResponseEntity<?> retrieveReviewListByAll(){
-        List<ReviewEntity> entities = reviewService.retrieve_all();
-
-        List<ReviewDTO> dtos = entities.stream().map(ReviewDTO::new).collect(Collectors.toList());
-
-        ResponseDTO<ReviewDTO> response = ResponseDTO.<ReviewDTO>builder().data(dtos).build();
+        //return ResponseEntity.ok().body(response);
 
         return ResponseEntity.ok().body(response);
     }
 
     @PutMapping
     public ResponseEntity<?> updateReview(@RequestBody ReviewDTO dto, @AuthenticationPrincipal String userId){
-        //String temp = "2c9e818c7e3eed68017e3eee8ae50000";
 
         //1. dto를 entity로 변환한다.
         ReviewEntity entity = ReviewDTO.toReviewEntity(dto);
