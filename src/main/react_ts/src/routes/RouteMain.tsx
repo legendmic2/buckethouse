@@ -5,6 +5,7 @@ import HomePage from "../pages/Home";
 import RootStore from "../stores/RootStore";
 import RootApi from "../apis/RootApi";
 import Blog from "../pages/blogTest/Blog";
+import ProductMain from "./ProductMain";
 
 const store = new RootStore();
 const api = new RootApi(store);
@@ -15,6 +16,7 @@ const RouteMain = () => {
             <Routes>
                 <Route path="/" element={<HomePage/>}/>
                 <Route path="/blog" element={<Blog/>}/>
+                <Route path="/product" element={<ProductMain/>}/>
                 <Route path="*" element={<Navigate replace to="/"/>}/>
             </Routes>
         </AppContext.Provider>
