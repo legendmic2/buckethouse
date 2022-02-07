@@ -4,11 +4,11 @@ import {useAppContext} from "../app-context";
 import Product from "../components/Product";
 
 const HomePage = observer(() => {
-    const { api, store } = useAppContext();
+    const {api, store} = useAppContext();
     const [loading, setLoading] = useState(false);
 
     const load = async () => {
-        try{
+        try {
             setLoading(true);
             await api.product.getAll();
             // User, Review
@@ -21,21 +21,18 @@ const HomePage = observer(() => {
         load();
     }, []);
 
-    if(loading){
+    if (loading) {
         return <div>loading...</div>;
     }
 
-        return (
-            <div>
-                <h1>Products</h1>
-                {store.product.all.map((product) => (
-                    <Product product={product} key={product.id} />
-                ))}
-            </div>
-        );
-    })
-
-
-;
+    return (
+        <div>
+            <h1>Products</h1>
+            {store.product.all.map((product) => (
+                <Product product={product} key={product.id}/>
+            ))}
+        </div>
+    );
+});
 
 export default HomePage;

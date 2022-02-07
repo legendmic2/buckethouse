@@ -7,3 +7,7 @@ export default interface IProduct {
     description: string;
     stock: number;
 }
+
+export interface IProductList {
+    data: IProduct[];
+}
