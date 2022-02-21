@@ -20,4 +20,8 @@ export default class ProductStore {
         return Array.from(this.byId.values());
     }
 
+    @action add(product: IProduct) {
+
+    }
+
 }
