@@ -34,7 +34,7 @@ const theme = createTheme();
 const LoginPage = observer(() => {
     const {api, store} = useAppContext();
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         // eslint-disable-next-line no-console
@@ -43,17 +43,15 @@ const LoginPage = observer(() => {
             password: data.get('password'),
         });
 
-        login({
+        await login({
             email: data.get('email'),
             password: data.get('password'),
         } as IUser);
 
-
-
     };
 
     const login = async (loginUser: IUser) => {
-        api.user.login(loginUser);
+        await api.user.login(loginUser);
     }
 
     return (

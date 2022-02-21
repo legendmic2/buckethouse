@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, {AxiosInstance} from "axios";
 import RootStore from "../stores/RootStore";
 import ProductApi from "./ProductApi";
 import UserApi from "./UserApi";
@@ -10,6 +10,8 @@ export default class RootApi {
     user: UserApi;
 
     // todo: user, review 추가
+
+    // todo: AxiosUtil 생성
 
     constructor(store: RootStore) {
         this.product = new ProductApi(this, store);
