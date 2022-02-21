@@ -12,6 +12,9 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import {useAppContext} from "../app-context";
+import IUser from "../types/User";
+import {observer} from "mobx-react-lite";
 
 function Copyright(props: any) {
     return (
@@ -28,7 +31,9 @@ function Copyright(props: any) {
 
 const theme = createTheme();
 
-export default function LoginPage() {
+const LoginPage = observer(() => {
+    const {api, store} = useAppContext();
+
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -37,7 +42,19 @@ export default function LoginPage() {
             email: data.get('email'),
             password: data.get('password'),
         });
+
+        login({
+            email: data.get('email'),
+            password: data.get('password'),
+        } as IUser);
+
+
+
     };
+
+    const login = async (loginUser: IUser) => {
+        api.user.login(loginUser);
+    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -125,4 +142,6 @@ export default function LoginPage() {
             </Grid>
         </ThemeProvider>
     );
-}
+});
+
+export default LoginPage;
