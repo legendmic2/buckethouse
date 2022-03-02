@@ -14,7 +14,7 @@ export default class UserApi {
 
         // login 성공시
         if("id" in res.data) {
-            window.localStorage.setItem("token", res.data.token);
+            window.localStorage.setItem("accessToken", res.data.token);
         }
         // todo: AxiosResponse, AxiosError로 구분할 수 있도록 AxiosUtil 생성
     }
