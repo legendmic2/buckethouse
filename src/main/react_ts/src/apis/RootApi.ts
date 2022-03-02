@@ -1,10 +1,10 @@
-import axios, {AxiosInstance} from "axios";
 import RootStore from "../stores/RootStore";
 import ProductApi from "./ProductApi";
 import UserApi from "./UserApi";
+import {axiosUtil} from "../utils/AxiosUtil";
 
 export default class RootApi {
-    client = axios.create({baseURL: "http://localhost:8080"});
+    client = axiosUtil;
 
     product: ProductApi;
     user: UserApi;
